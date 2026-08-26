@@ -1,7 +1,6 @@
 
--- ==================== 1. CRIAR AS TABELAS ====================
 
--- Tabela REGIOES
+
 CREATE TABLE REGIOES (
     id_regiao       INT PRIMARY KEY AUTO_INCREMENT,
     nome            VARCHAR(50)  NOT NULL,
@@ -9,7 +8,7 @@ CREATE TABLE REGIOES (
     potencial       VARCHAR(20)  NOT NULL   -- Alto / Médio / Baixo
 );
 
--- Tabela USINAS (chave estrangeira para REGIOES)
+
 CREATE TABLE USINAS (
     id_usina        INT PRIMARY KEY AUTO_INCREMENT,
     nome            VARCHAR(50)  NOT NULL,
@@ -19,7 +18,7 @@ CREATE TABLE USINAS (
     FOREIGN KEY (id_regiao) REFERENCES REGIOES(id_regiao)
 );
 
--- Tabela GERACAO (chave estrangeira para USINAS)
+
 CREATE TABLE GERACAO (
     id_geracao      INT PRIMARY KEY AUTO_INCREMENT,
     id_usina        INT NOT NULL,
@@ -28,9 +27,9 @@ CREATE TABLE GERACAO (
     FOREIGN KEY (id_usina) REFERENCES USINAS(id_usina)
 );
 
--- ==================== 2. INSERIR DADOS ====================
 
--- 10 regiões
+
+
 INSERT INTO REGIOES (nome, estado, potencial) VALUES
 ('Sertão Central', 'CE', 'Alto'),
 ('Litoral Sul', 'RS', 'Médio'),
@@ -43,7 +42,7 @@ INSERT INTO REGIOES (nome, estado, potencial) VALUES
 ('Pantanal', 'MS', 'Baixo'),
 ('Amazônia Legal', 'PA', 'Médio');
 
--- 12 usinas
+
 INSERT INTO USINAS (nome, tipo, capacidade_mw, id_regiao) VALUES
 ('Usina Sol Nascente', 'Solar', 150.00, 1),
 ('Usina Vento Forte', 'Eólica', 200.00, 2),
@@ -58,7 +57,7 @@ INSERT INTO USINAS (nome, tipo, capacidade_mw, id_regiao) VALUES
 ('Usina Sertão Ventos', 'Eólica', 175.00, 1),
 ('Usina Bahia Solar', 'Solar', 140.00, 3);
 
--- 15 registros de geração
+
 INSERT INTO GERACAO (id_usina, data_geracao, energia_mwh) VALUES
 (1, '2026-01-05', 320.50),
 (2, '2026-01-05', 410.00),
@@ -76,34 +75,29 @@ INSERT INTO GERACAO (id_usina, data_geracao, energia_mwh) VALUES
 (3, '2026-01-09', 615.25),
 (9, '2026-01-09', 470.00);
 
--- ==================== 4. EXECUTAR CONSULTAS ====================
 
--- 4.1 UPDATE: reajustar capacidade das usinas solares em 5%
 UPDATE USINAS
 SET capacidade_mw = capacidade_mw * 1.05
 WHERE tipo = 'Solar';
 
--- 4.2 DELETE (exemplo alternativo, comentado — mantenha apenas um dos dois):
--- DELETE FROM GERACAO WHERE energia_mwh < 100;
 
--- 4.3 SELECT simples: listar todas as usinas eólicas
 SELECT nome, capacidade_mw
 FROM USINAS
 WHERE tipo = 'Eólica';
 
--- 4.4 Funções agregadas (3 exemplos)
+
 SELECT SUM(energia_mwh) AS total_gerado FROM GERACAO;
 SELECT AVG(capacidade_mw) AS capacidade_media FROM USINAS;
 SELECT COUNT(*) AS total_usinas FROM USINAS;
 
--- 4.5 GROUP BY e HAVING: usinas com geração total acima de 600 MWh
+
 SELECT u.nome, SUM(g.energia_mwh) AS total_gerado
 FROM USINAS u
 JOIN GERACAO g ON u.id_usina = g.id_usina
 GROUP BY u.nome
 HAVING SUM(g.energia_mwh) > 600;
 
--- 4.6 JOIN entre tabelas: geração com nome da usina e da região
+
 SELECT g.data_geracao, u.nome AS usina, r.nome AS regiao, g.energia_mwh
 FROM GERACAO g
 JOIN USINAS u ON g.id_usina = u.id_usina
@@ -111,7 +105,7 @@ JOIN REGIOES r ON u.id_regiao = r.id_regiao
 ORDER BY g.data_geracao;
 
 -- ==================== DESAFIO BÔNUS ====================
--- Região com a maior geração total de energia
+
 SELECT r.nome AS regiao, SUM(g.energia_mwh) AS total_gerado
 FROM REGIOES r
 JOIN USINAS u ON r.id_regiao = u.id_regiao
